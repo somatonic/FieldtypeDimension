@@ -37,3 +37,7 @@ screen, click the "Check for New Modules" button.
 3. Now scroll to the FieldtypeDimension module and click "Install". The required InputfieldDimension will get installed automatic.
 
 4. Create a new Field with the new "Dimension" Fieldtype.
+
+## Support thread
+
+[http://processwire.com/talk/topic/4081-fieldtypedimension/](http://processwire.com/talk/topic/4081-fieldtypedimension/)

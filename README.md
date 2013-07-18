@@ -15,15 +15,26 @@ echo $page->fieldname->height;
 echo $page->fieldname->depth;
 ```
 
+There's also support for a computed value of the volume. W*H*D. This will get stored additionally
+to the database and updated every time a dimension value changed. So it can also be used in selectors for querying.
+
+```
+echo $page->fieldname->volume;
+```
+
 ### Use in selectors strings
 
 The dimensions can be used in selectors like:
 
     `$pages->find("dimension.width=120");`
 
-Or
+or
 
     `$pages->find("dimension.height>=100, dimension.depth<120");`
+
+or
+
+    `$pages->find("dimension.volue>=1000);`
 
 
 ## How to install

@@ -5,6 +5,7 @@
  * by "Soma" Philipp Urlich
  *
  * Field that stores 3 integer values for width/height/depth.
+ * Additionally it calculates the volume for the dimension to be used for output or use in selectors.
  *
  * ProcessWire 2.x
  * Copyright (C) 2010 by Ryan Cramer
@@ -26,7 +27,8 @@ class FieldtypeDimension extends Fieldtype {
         return array(
             'title' => __('Dimension Fieldtype', __FILE__), // Module Title
             'summary' => __('Field that stores 3 integer values for width/height/depth.', __FILE__), // Module Summary
-            'version' => 100,
+            'version' => 101,
+            'author' => 'Soma',
             'installs' => 'InputfieldDimension'
         );
     }
@@ -46,7 +48,7 @@ class FieldtypeDimension extends Fieldtype {
     /**
      *
      * Add mapping to different name for use in page selectors
-     * This enables to use it like "field.width=100, field.height<=200, field.depth>100"
+     * This enables us to use it like "field.width=100, field.height<=200, field.depth>100"
      */
     public function getMatchQuery($query, $table, $subfield, $operator, $value) {
         if($subfield == 'width') $subfield = 'data';
@@ -65,7 +67,7 @@ class FieldtypeDimension extends Fieldtype {
         $dim->set('width', $field->width ? $field->width : $this->defaults['defaultValue']);
         $dim->set('height', $field->height ? $field->height : $this->defaults['defaultValue']);
         $dim->set('depth', $field->depth ? $field->depth : $this->defaults['defaultValue']);
-        $dim->set('inputwidth', $field->inputwidth ? $field->inputwidth : '100');
+        $dim->set('input_width', $field->input_width ? $field->input_width : '100');
 
         return $dim;
     }
@@ -98,8 +100,13 @@ class FieldtypeDimension extends Fieldtype {
 
         // report any changes to the field values
         if($value->isChanged('width')
-            || $value->isChanged('height')
-            || $value->isChanged('depth')) $page->trackChange($field->name);
+                || $value->isChanged('height')
+                || $value->isChanged('depth')) {
+            $page->trackChange($field->name);
+
+            // recompute volume
+            $value->volume = $value->width * $value->height * $value->depth;
+        }
 
         return $value;
     }
@@ -112,16 +119,18 @@ class FieldtypeDimension extends Fieldtype {
 
         // get blank dim
         $dim = $this->getBlankValue($page, $field);
+
         // populate the dim
-        $dim->width = $value['data'];
-        $dim->height = $value['data_height'];
-        $dim->depth = $value['data_depth'];
+        $dim->width = (int) $value['data'];
+        $dim->height = (int) $value['data_height'];
+        $dim->depth = (int) $value['data_depth'];
+        $dim->volume = (int) $value['data_volume'];
 
         return $dim;
     }
 
     /**
-     * return converted from object to array
+     * return converted from object to array for storing in database
      *
      */
     public function ___sleepValue(Page $page, Field $field, $value) {
@@ -133,33 +142,51 @@ class FieldtypeDimension extends Fieldtype {
             throw new WireException("Expecting an instance of Dimension");
 
         $sleepValue = array(
-            'data' => $dim->width,
-            'data_height' => $dim->height,
-            'data_depth' => $dim->depth
+            'data' => (int) $dim->width,
+            'data_height' => (int) $dim->height,
+            'data_depth' => (int) $dim->depth,
+            'data_volume' => (int) $dim->volume
             );
 
         return $sleepValue;
     }
 
-
+    /**
+     * Get the database schema for this field
+     *
+     * @param Field $field In case it's needed for the schema, but usually should not.
+     * @return array
+     */
     public function getDatabaseSchema(Field $field) {
 
         $schema = parent::getDatabaseSchema($field);
         $schema['data'] = 'int NOT NULL default 0';
         $schema['data_height'] = 'int NOT NULL default 0';
         $schema['data_depth'] = 'int NOT NULL default 0';
-        $schema['keys']['data_dim'] = 'KEY data_dim(data, data_height, data_depth)';
+        $schema['data_volume'] = 'int NOT NULL default 0';
+        $schema['keys']['data_height'] = 'KEY data_height(data_height)';
+        $schema['keys']['data_depth'] = 'KEY data_depth(data_depth)';
+        $schema['keys']['data_volume'] = 'KEY data_volume(data_volume)';
         return $schema;
     }
 
+    /**
+     * Get any inputfields used for configuration of this Fieldtype.
+     *
+     * This is in addition any configuration fields supplied by the parent Inputfield.
+     *
+     * @param Field $field
+     * @return InputfieldWrapper
+     *
+     */
     public function ___getConfigInputfields(Field $field) {
         $inputfields = parent::___getConfigInputfields($field);
 
         $f = $this->modules->get('InputfieldInteger');
-        $f->setAttribute('name', 'inputwidth');
+        $f->attr('name', 'input_width');
         $f->label = 'Input width';
-        $f->setAttribute('value', $field->inputwidth ? $field->inputwidth : '100' );
-        $f->setAttribute('size', 10);
+        $f->attr('value', $field->input_width ? $field->input_width : '100' );
+        $f->attr('size', 10);
         $f->description = 'Width of the inputs in pixels.';
         $inputfields->append($f);
 
@@ -170,7 +197,7 @@ class FieldtypeDimension extends Fieldtype {
 
 
 /**
- * Class to hold dimension object
+ * Helper WireData Class to hold a dimension object
  *
  */
 class Dimension extends WireData {
@@ -193,6 +220,5 @@ class Dimension extends WireData {
     public function get($key) {
         return parent::get($key);
     }
-
 
 }

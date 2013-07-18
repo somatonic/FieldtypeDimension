@@ -19,30 +19,35 @@ class InputfieldDimension extends Inputfield {
         return array(
             'title' => __('Dimension Inputfield', __FILE__), // Module Title
             'summary' => __('Simple dimension input field.', __FILE__), // Module Summary
-            'version' => 100,
+            'version' => 101,
+            'author' => 'Soma',
             'requires' => array("FieldtypeDimension")
         );
     }
 
+    /**
+     * Construct the Inputfield, setting defaults for all properties
+     *
+     */
     public function __construct() {
         parent::__construct();
+        $this->set('input_suffix','');
     }
 
+    /**
+     * Per the Module interface, init() is called when the system is ready for API usage
+     *
+     */
     public function init() {
         return parent::init();
     }
 
-    public function set($key, $value) {
-        if($key == 'inputType') {
-            $this->attr('type', $value);
-        }
-        return parent::set($key, $value);
-    }
-
-    public function setAttribute($key, $value) {
-        return parent::setAttribute($key, $value);
-    }
-
+    /**
+     * Return the completed output of this Inputfield, ready for insertion in an XHTML form
+     *
+     * @return string
+     *
+     */
     public function ___render() {
 
         $out = '';
@@ -52,14 +57,20 @@ class InputfieldDimension extends Inputfield {
         $label_height = $this->_("H");
         $label_depth = $this->_("D");
 
-        $out .= "<div class='dimension_col'><label>{$label_width} <input type='number' style='width:{$this->inputwidth}px' name='{$this->name}_width' id='Inputfield_" . $this->name . "_width' value='" . $value->width . "'/></label></div>";
-        $out .= "<div class='dimension_col'><label>{$label_height} <input type='number' style='width:{$this->inputwidth}px' name='{$this->name}_height' id='Inputfield_" . $this->name . "_height' value='" . $value->height . "'/></label></div>";
-        $out .= "<div class='dimension_col'><label>{$label_depth} <input type='number' style='width:{$this->inputwidth}px' name='{$this->name}_depth' id='Inputfield_" . $this->name . "_depth' value='" . $value->depth . "'/></label></div>";
+        $out .= "<div class='dimension_col'><label>{$label_width} <input type='number' style='width:{$this->input_width}px' name='{$this->name}_width' id='Inputfield_" . $this->name . "_width' value='" . $value->width . "'/>{$this->input_suffix}</label></div>";
+        $out .= "<div class='dimension_col'><label>{$label_height} <input type='number' style='width:{$this->input_width}px' name='{$this->name}_height' id='Inputfield_" . $this->name . "_height' value='" . $value->height . "'/>{$this->input_suffix}</label></div>";
+        $out .= "<div class='dimension_col'><label>{$label_depth} <input type='number' style='width:{$this->input_width}px' name='{$this->name}_depth' id='Inputfield_" . $this->name . "_depth' value='" . $value->depth . "'/>{$this->input_suffix}</label></div>";
 
         return $out;
     }
 
-
+    /**
+     * Process the input from the given WireInputData (usually $input->get or $input->post), load and clean the value for use in this Inputfield.
+     *
+     * @param WireInputData $input
+     * @return $this
+     *
+     */
     public function ___processInput(WireInputData $input) {
 
         $name = $this->attr('name');
@@ -75,13 +86,34 @@ class InputfieldDimension extends Inputfield {
         foreach($dim_names as $key => $name) {
             if(isset($input->$name)) {
                 if($dim->$key != $input->$name){
-                    $dim->set($key, $input->$name);
+                    $dim->set($key, (int) $input->$name);
                     $this->trackChange('value');
                 }
             }
         }
 
         return $this;
+    }
+
+
+    /**
+     * Get any custom configuration fields for this Inputfield
+     *
+     * @return InputfieldWrapper
+     *
+     */
+    public function ___getConfigInputfields() {
+        $inputfields = parent::___getConfigInputfields();
+
+        $f = $this->modules->get('InputfieldText');
+        $f->attr('name', 'input_suffix');
+        $f->label = 'Input Suffix';
+        $f->attr('value', strlen($this->input_suffix) ? $this->input_suffix : '' );
+        $f->attr('size', 10);
+        $f->description = 'Suffix to append to each of the three inputs.';
+        $inputfields->append($f);
+
+        return $inputfields;
     }
 
 }

@@ -32,6 +32,7 @@ class InputfieldDimension extends Inputfield {
     public function __construct() {
         parent::__construct();
         $this->set('input_suffix','');
+        $this->set('input_width', 100);
     }
 
     /**
@@ -104,6 +105,14 @@ class InputfieldDimension extends Inputfield {
      */
     public function ___getConfigInputfields() {
         $inputfields = parent::___getConfigInputfields();
+
+        $f = $this->modules->get('InputfieldInteger');
+        $f->attr('name', 'input_width');
+        $f->label = 'Input width';
+        $f->attr('value', $this->input_width ? $this->input_width : 100 );
+        $f->attr('size', 10);
+        $f->description = 'Width of the inputs in pixels.';
+        $inputfields->append($f);
 
         $f = $this->modules->get('InputfieldText');
         $f->attr('name', 'input_suffix');

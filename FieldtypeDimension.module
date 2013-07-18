@@ -68,7 +68,6 @@ class FieldtypeDimension extends Fieldtype {
         $dim->set('width', $field->width ? $field->width : $this->defaults['defaultValue']);
         $dim->set('height', $field->height ? $field->height : $this->defaults['defaultValue']);
         $dim->set('depth', $field->depth ? $field->depth : $this->defaults['defaultValue']);
-        $dim->set('input_width', $field->input_width ? $field->input_width : '100');
 
         return $dim;
     }
@@ -182,14 +181,6 @@ class FieldtypeDimension extends Fieldtype {
      */
     public function ___getConfigInputfields(Field $field) {
         $inputfields = parent::___getConfigInputfields($field);
-
-        $f = $this->modules->get('InputfieldInteger');
-        $f->attr('name', 'input_width');
-        $f->label = 'Input width';
-        $f->attr('value', $field->input_width ? $field->input_width : '100' );
-        $f->attr('size', 10);
-        $f->description = 'Width of the inputs in pixels.';
-        $inputfields->append($f);
 
         return $inputfields;
     }

@@ -34,7 +34,7 @@ or
 
 or
 
-`$pages->find("dimension.volue>=1000);`
+`$pages->find("dimension.volume>=1000);`
 
 
 ## How to install

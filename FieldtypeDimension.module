@@ -18,16 +18,12 @@
 
 class FieldtypeDimension extends Fieldtype {
 
-    protected $defaults = array(
-        'defaultValue' => 0
-        );
-
 
     public static function getModuleInfo() {
         return array(
             'title' => __('Dimension Fieldtype', __FILE__), // Module Title
             'summary' => __('Field that stores 3 integer values for width, height and depth. Additionally it calculates the volume value and stores it.', __FILE__), // Module Summary
-            'version' => 101,
+            'version' => 102,
             'author' => 'Soma',
             'installs' => 'InputfieldDimension'
         );
@@ -64,11 +60,6 @@ class FieldtypeDimension extends Fieldtype {
      */
     public function getInputfield(Page $page, Field $field) {
         $dim = $this->modules->get('InputfieldDimension');
-
-        $dim->set('width', $field->width ? $field->width : $this->defaults['defaultValue']);
-        $dim->set('height', $field->height ? $field->height : $this->defaults['defaultValue']);
-        $dim->set('depth', $field->depth ? $field->depth : $this->defaults['defaultValue']);
-
         return $dim;
     }
 
@@ -132,21 +123,19 @@ class FieldtypeDimension extends Fieldtype {
      */
     public function ___sleepValue(Page $page, Field $field, $value) {
 
-        $dim = $value;
-
         // throw error if value is not of the right type
-        if(!$dim instanceof Dimension)
+        if(!$value instanceof Dimension)
             throw new WireException("Expecting an instance of Dimension");
 
         $sleepValue = array(
-            'data' => (int) $dim->width,
-            'data_height' => (int) $dim->height,
-            'data_depth' => (int) $dim->depth
+            'data' => (int) $value->width,
+            'data_height' => (int) $value->height,
+            'data_depth' => (int) $value->depth
             );
 
         // recalculate if dimensions have changed
-        if($dim->isChanged('width') || $dim->isChanged('height') || $dim->isChanged('depth')){
-            $sleepValue['data_volume'] = (int) ($dim->width * $dim->height * $dim->depth);
+        if($value->isChanged('width') || $value->isChanged('height') || $value->isChanged('depth')){
+            $sleepValue['data_volume'] = (int) ($value->width * $value->height * $value->depth);
         }
 
         return $sleepValue;
@@ -197,10 +186,10 @@ class FieldtypeDimension extends Fieldtype {
 class Dimension extends WireData {
 
     public function __construct() {
-        $this->set('width', 0);
-        $this->set('height', 0);
-        $this->set('depth', 0);
-        $this->set('volume', 0);
+        $this->set('width', null);
+        $this->set('height', null);
+        $this->set('depth', null);
+        $this->set('volume', null);
     }
 
     public function set($key, $value) {
@@ -208,7 +197,7 @@ class Dimension extends WireData {
         if($key == 'width' || $key == 'height' || $key == 'depth' || $key == 'volume') {
             // if value isn't numeric, don't change the value if already
             // one set, else set it to 0 and throw an exception so it can be seen on API usage
-            if(!is_int($value)) {
+            if(!is_int($value) && !is_null($value)) {
                 $value = $this->$key ? $this->$key : 0;
                 throw new WireException("Dimension Object only accepts integers (int) values");
             }

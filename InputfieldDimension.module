@@ -19,7 +19,7 @@ class InputfieldDimension extends Inputfield {
         return array(
             'title' => __('Dimension Inputfield', __FILE__), // Module Title
             'summary' => __('Simple dimension input field.', __FILE__), // Module Summary
-            'version' => 101,
+            'version' => 102,
             'author' => 'Soma',
             'requires' => array("FieldtypeDimension")
         );
@@ -30,9 +30,9 @@ class InputfieldDimension extends Inputfield {
      *
      */
     public function __construct() {
-        parent::__construct();
         $this->set('input_suffix','');
         $this->set('input_width', 100);
+        parent::__construct();
     }
 
     /**
@@ -52,15 +52,23 @@ class InputfieldDimension extends Inputfield {
     public function ___render() {
 
         $out = '';
-        $value = $this->attr('value');
+        $value = $this->attr('value') ? $this->attr('value') : new Dimension();
 
         $label_width = $this->_("W");
         $label_height = $this->_("H");
         $label_depth = $this->_("D");
 
-        $out .= "<div class='dimension_col'><label>{$label_width} <input type='number' style='width:{$this->input_width}px' name='{$this->name}_width' id='Inputfield_" . $this->name . "_width' value='" . $value->width . "'/>{$this->input_suffix}</label></div>";
-        $out .= "<div class='dimension_col'><label>{$label_height} <input type='number' style='width:{$this->input_width}px' name='{$this->name}_height' id='Inputfield_" . $this->name . "_height' value='" . $value->height . "'/>{$this->input_suffix}</label></div>";
-        $out .= "<div class='dimension_col'><label>{$label_depth} <input type='number' style='width:{$this->input_width}px' name='{$this->name}_depth' id='Inputfield_" . $this->name . "_depth' value='" . $value->depth . "'/>{$this->input_suffix}</label></div>";
+        $out .= "<div class='dimension_col'>";
+        $out .= "<label>{$label_width}: <input type='number' min='0' style='width:{$this->input_width}px' name='{$this->name}_width' id='Inputfield_{$this->name}_width' value='{$value->width}'/> {$this->input_suffix}</label>";
+        $out .= "</div>";
+
+        $out .= "<div class='dimension_col'>";
+        $out .= "<label>{$label_height}: <input type='number' min='0' style='width:{$this->input_width}px' name='{$this->name}_height' id='Inputfield_{$this->name}_height' value='{$value->height}'/> {$this->input_suffix}</label>";
+        $out .= "</div>";
+
+        $out .= "<div class='dimension_col'>";
+        $out .= "<label>{$label_depth}: <input type='number' min='0' style='width:{$this->input_width}px' name='{$this->name}_depth' id='Inputfield_{$this->name}_depth' value='{$value->depth}'/> {$this->input_suffix}</label>";
+        $out .= "</div>";
 
         return $out;
     }
@@ -75,7 +83,7 @@ class InputfieldDimension extends Inputfield {
     public function ___processInput(WireInputData $input) {
 
         $name = $this->attr('name');
-        $dim = $this->attr('value');
+        $value = $this->attr('value');
 
         $dim_names = array(
                 'width' => $name . "_width",
@@ -86,12 +94,12 @@ class InputfieldDimension extends Inputfield {
         // loop all inputs and set them if changed
         foreach($dim_names as $key => $name) {
             if(isset($input->$name)) {
-                if($dim->$key != $input->$name) {
-                    if(!is_numeric($input->$name)) {
+                if($value->$key != $input->$name) {
+                    if(!is_numeric($input->$name) && !empty($input->$name)) {
                         // in case the input isn't numeric show an error
                         $this->error($this->_("Field only accepts integers (int) values"));
                     } else {
-                        $dim->set($key, (int) $input->$name);
+                        $value->set($key, (int) $input->$name);
                         $this->trackChange('value');
                     }
 

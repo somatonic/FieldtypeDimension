@@ -48,9 +48,13 @@ class InputfieldDimension extends Inputfield {
         $out = '';
         $value = $this->attr('value');
 
-        $out .= "<div class='dimension_col'><label>W <input type='number' style='width:{$this->inputwidth}px' name='{$this->name}_width' id='Inputfield_" . $this->name . "_width' value='" . $value->width . "'/></label></div>";
-        $out .= "<div class='dimension_col'><label>H <input type='number' style='width:{$this->inputwidth}px' name='{$this->name}_height' id='Inputfield_" . $this->name . "_height' value='" . $value->height . "'/></label></div>";
-        $out .= "<div class='dimension_col'><label>D <input type='number' style='width:{$this->inputwidth}px' name='{$this->name}_depth' id='Inputfield_" . $this->name . "_depth' value='" . $value->depth . "'/></label></div>";
+        $label_width = $this->_("W");
+        $label_height = $this->_("H");
+        $label_depth = $this->_("D");
+
+        $out .= "<div class='dimension_col'><label>{$label_width} <input type='number' style='width:{$this->inputwidth}px' name='{$this->name}_width' id='Inputfield_" . $this->name . "_width' value='" . $value->width . "'/></label></div>";
+        $out .= "<div class='dimension_col'><label>{$label_height} <input type='number' style='width:{$this->inputwidth}px' name='{$this->name}_height' id='Inputfield_" . $this->name . "_height' value='" . $value->height . "'/></label></div>";
+        $out .= "<div class='dimension_col'><label>{$label_depth} <input type='number' style='width:{$this->inputwidth}px' name='{$this->name}_depth' id='Inputfield_" . $this->name . "_depth' value='" . $value->depth . "'/></label></div>";
 
         return $out;
     }

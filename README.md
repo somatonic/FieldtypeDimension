@@ -26,15 +26,15 @@ echo $page->fieldname->volume;
 
 The dimensions can be used in selectors like:
 
-    `$pages->find("dimension.width=120");`
+`$pages->find("dimension.width=120");`
 
 or
 
-    `$pages->find("dimension.height>=100, dimension.depth<120");`
+`$pages->find("dimension.height>=100, dimension.depth<120");`
 
 or
 
-    `$pages->find("dimension.volue>=1000);`
+`$pages->find("dimension.volue>=1000);`
 
 
 ## How to install

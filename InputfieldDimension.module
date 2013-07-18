@@ -78,17 +78,23 @@ class InputfieldDimension extends Inputfield {
         $dim = $this->attr('value');
 
         $dim_names = array(
-                    'width' => $name . "_width",
-                    'height' => $name . "_height",
-                    'depth' => $name . "_depth"
-                    );
+                'width' => $name . "_width",
+                'height' => $name . "_height",
+                'depth' => $name . "_depth"
+            );
 
-        // loop all 2 inputs and set them if changed
+        // loop all inputs and set them if changed
         foreach($dim_names as $key => $name) {
             if(isset($input->$name)) {
-                if($dim->$key != $input->$name){
-                    $dim->set($key, (int) $input->$name);
-                    $this->trackChange('value');
+                if($dim->$key != $input->$name) {
+                    if(!is_numeric($input->$name)) {
+                        // in case the input isn't numeric show an error
+                        $this->error($this->_("Field only accepts integers (int) values"));
+                    } else {
+                        $dim->set($key, (int) $input->$name);
+                        $this->trackChange('value');
+                    }
+
                 }
             }
         }

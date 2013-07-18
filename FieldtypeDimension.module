@@ -26,7 +26,7 @@ class FieldtypeDimension extends Fieldtype {
     public static function getModuleInfo() {
         return array(
             'title' => __('Dimension Fieldtype', __FILE__), // Module Title
-            'summary' => __('Field that stores 3 integer values for width/height/depth.', __FILE__), // Module Summary
+            'summary' => __('Field that stores 3 integer values for width, height and depth. Additionally it calculates the volume value and stores it.', __FILE__), // Module Summary
             'version' => 101,
             'author' => 'Soma',
             'installs' => 'InputfieldDimension'
@@ -146,7 +146,7 @@ class FieldtypeDimension extends Fieldtype {
 
         // recalculate if dimensions have changed
         if($dim->isChanged('width') || $dim->isChanged('height') || $dim->isChanged('depth')){
-            $sleepValue['data_volume'] = $dim->width * $dim->height * $dim->depth;
+            $sleepValue['data_volume'] = (int) ($dim->width * $dim->height * $dim->depth);
         }
 
         return $sleepValue;
@@ -165,6 +165,7 @@ class FieldtypeDimension extends Fieldtype {
         $schema['data_height'] = 'int NOT NULL default 0';
         $schema['data_depth'] = 'int NOT NULL default 0';
         $schema['data_volume'] = 'int NOT NULL default 0';
+        // key for data will already be added from the parent
         $schema['keys']['data_height'] = 'KEY data_height(data_height)';
         $schema['keys']['data_depth'] = 'KEY data_depth(data_depth)';
         $schema['keys']['data_volume'] = 'KEY data_volume(data_volume)';
@@ -182,7 +183,7 @@ class FieldtypeDimension extends Fieldtype {
      */
     public function ___getConfigInputfields(Field $field) {
         $inputfields = parent::___getConfigInputfields($field);
-
+        // nothing yet
         return $inputfields;
     }
 
@@ -196,17 +197,21 @@ class FieldtypeDimension extends Fieldtype {
 class Dimension extends WireData {
 
     public function __construct() {
-        $this->set('width', '');
-        $this->set('height', '');
-        $this->set('depth', '');
-        $this->set('volume', '');
+        $this->set('width', 0);
+        $this->set('height', 0);
+        $this->set('depth', 0);
+        $this->set('volume', 0);
     }
 
     public function set($key, $value) {
 
         if($key == 'width' || $key == 'height' || $key == 'depth' || $key == 'volume') {
-            // if value isn't numeric, then it's not valid: make it blank
-            if(!is_numeric($value)) $value = '';
+            // if value isn't numeric, don't change the value if already
+            // one set, else set it to 0 and throw an exception so it can be seen on API usage
+            if(!is_int($value)) {
+                $value = $this->$key ? $this->$key : 0;
+                throw new WireException("Dimension Object only accepts integers (int) values");
+            }
         }
         return parent::set($key, $value);
     }

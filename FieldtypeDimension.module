@@ -103,9 +103,6 @@ class FieldtypeDimension extends Fieldtype {
                 || $value->isChanged('height')
                 || $value->isChanged('depth')) {
             $page->trackChange($field->name);
-
-            // recompute volume
-            $value->volume = $value->width * $value->height * $value->depth;
         }
 
         return $value;
@@ -144,9 +141,13 @@ class FieldtypeDimension extends Fieldtype {
         $sleepValue = array(
             'data' => (int) $dim->width,
             'data_height' => (int) $dim->height,
-            'data_depth' => (int) $dim->depth,
-            'data_volume' => (int) $dim->volume
+            'data_depth' => (int) $dim->depth
             );
+
+        // recalculate if dimensions have changed
+        if($dim->isChanged('width') || $dim->isChanged('height') || $dim->isChanged('depth')){
+            $sleepValue['data_volume'] = $dim->width * $dim->height * $dim->depth;
+        }
 
         return $sleepValue;
     }
@@ -198,11 +199,12 @@ class Dimension extends WireData {
         $this->set('width', '');
         $this->set('height', '');
         $this->set('depth', '');
+        $this->set('volume', '');
     }
 
     public function set($key, $value) {
 
-        if($key == 'width' || $key == 'height' || $key == 'depth') {
+        if($key == 'width' || $key == 'height' || $key == 'depth' || $key == 'volume') {
             // if value isn't numeric, then it's not valid: make it blank
             if(!is_numeric($value)) $value = '';
         }

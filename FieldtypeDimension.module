@@ -54,6 +54,7 @@ class FieldtypeDimension extends Fieldtype {
         if($subfield == 'width') $subfield = 'data';
         if($subfield == 'height') $subfield = 'data_height';
         if($subfield == 'depth') $subfield = 'data_depth';
+        if($subfield == 'volume') $subfield = 'data_volume';
         return parent::getMatchQuery($query, $table, $subfield, $operator, $value);
     }
 

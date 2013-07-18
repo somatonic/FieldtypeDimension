@@ -1,5 +1,5 @@
 
-# Dimension Fieldtype for ProcessWire 2.+
+# Dimension Fieldtype
 
 ## What it does
 

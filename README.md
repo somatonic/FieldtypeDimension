@@ -8,15 +8,21 @@ This fieldtype let's you define 3 dimensions width / height / depth as integer.
 ### Output the values in templates
 
 There's a property for each dimension
-    `echo $page->fieldname->width`
-    `echo $page->fieldname->height`
-    `echo $page->fieldname->depth`
+
+```
+echo $page->fieldname->width;
+echo $page->fieldname->height;
+echo $page->fieldname->depth;
+```
 
 ### Use in selectors strings
 
 The dimensions can be used in selectors like:
+
     `$pages->find("dimension.width=120");`
+
 Or
+
     `$pages->find("dimension.height>=100, dimension.depth<120");`
 
 

@@ -36,6 +36,11 @@ or
 
 `$pages->find("dimension.volume>=1000);`
 
+### Field Settings
+
+* There's field settings for the width of the inputs in pixels.
+* There's a input setting to add a suffix string to each input like "mm" or whatever you like.
+
 
 ## How to install
 

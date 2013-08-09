@@ -19,7 +19,7 @@ class InputfieldDimension extends Inputfield {
         return array(
             'title' => __('Dimension Inputfield', __FILE__), // Module Title
             'summary' => __('Simple dimension input field.', __FILE__), // Module Summary
-            'version' => 102,
+            'version' => 103,
             'author' => 'Soma',
             'requires' => array("FieldtypeDimension")
         );

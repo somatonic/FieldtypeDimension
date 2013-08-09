@@ -23,14 +23,10 @@ class FieldtypeDimension extends Fieldtype {
         return array(
             'title' => __('Dimension Fieldtype', __FILE__), // Module Title
             'summary' => __('Field that stores 3 integer values for width, height and depth. Additionally it calculates the volume value and stores it.', __FILE__), // Module Summary
-            'version' => 102,
+            'version' => 103,
             'author' => 'Soma',
             'installs' => 'InputfieldDimension'
         );
-    }
-
-    public function __construct() {
-        parent::__construct();
     }
 
     /**
